@@ -16,7 +16,14 @@ const app = express();
 const port = process.env.PORT || 5000;
 const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
-await connectDb();
+// Connect to database with error handling
+try {
+  await connectDb();
+  console.log("✅ Database connected successfully");
+} catch (error) {
+  console.error("❌ Database connection failed:", error.message);
+  process.exit(1);
+}
 
 app.use(helmet());
 app.use(morgan("dev"));
