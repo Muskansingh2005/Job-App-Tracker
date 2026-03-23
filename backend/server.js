@@ -14,7 +14,16 @@ dotenv.config();
 const app = express();
 
 const port = process.env.PORT || 5000;
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+
+// Support multiple origins for CORS
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://job-app-tracker-63j5zc55t-ms6464660-6464s-projects.vercel.app",
+  process.env.CLIENT_ORIGIN,
+].filter(Boolean);
+
+console.log("📌 Allowed Origins:", allowedOrigins);
 
 // Connect to database with error handling
 try {
@@ -29,8 +38,18 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: clientOrigin,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, curl requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`❌ CORS blocked origin: ${origin}`);
+        callback(new Error("CORS not allowed for this origin"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 app.use(express.json({ limit: "1mb" }));
