@@ -12,9 +12,7 @@ import { notFound, errorHandler } from "./src/middleware/errorMiddleware.js";
 dotenv.config();
 
 const app = express();
-
 const port = process.env.PORT || 5000;
-
 // Support multiple origins for CORS
 const allowedOrigins = [
   "http://localhost:5173",
